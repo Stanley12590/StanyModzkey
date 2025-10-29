@@ -1,0 +1,606 @@
+[
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+]
+[
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+]
+[
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+]
+[
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+    ][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+    ][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+    ][
+  {
+    "Device Id": "PASTE-DEVICE-ID", 
+    "username": "PASTE-USERNAME",
+    "password": "PASTE-PASSWORD",
+    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+  },
+  {
+    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "username": "abc",
+    "password": "101",
+    "expiry": "2026-09-29"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "def",
+    "password": "102",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "ghi",
+    "password": "103",
+    "expiry": "2026-01-01"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "jkl",
+    "password": "104",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "mno",
+    "password": "105",
+    "expiry": "2025-10-04"
+  },
+  {
+    "Device Id": "PASTE-DEVICE-ID",
+    "username": "pqr",
+    "password": "106",
+    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+  }
+    ]
