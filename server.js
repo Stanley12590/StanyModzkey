@@ -1,17 +1,15 @@
-// server.js — FIXED & OPTIMIZED FOR YOUR REPO
+// server.js — FINAL VERSION (GitHub API + JSON Error Handling)
 const express = require('express');
 const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🔑 Config (do not hardcode secrets here!)
 const GITHUB_USER = 'Stanley12590';
 const REPO_NAME = 'StanyModzkey';
 const FILE_PATH = 'Acceckey.json';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Must be set in Render
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
 
-// 🔒 Safety check
 if (!GITHUB_TOKEN) {
   console.error('❌ FATAL: GITHUB_TOKEN environment variable is missing.');
   process.exit(1);
@@ -24,14 +22,13 @@ let isLoggedIn = false;
 
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
 
-// 📥 FETCH KEYS (using raw content)
 async function fetchKeysFromGitHub() {
   try {
     const response = await axios.get(GITHUB_API, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
         'User-Agent': 'Stany-Key-Admin',
-        Accept: 'application/vnd.github.v3.raw' // ✅ CORRECT FOR FILE CONTENTS
+        Accept: 'application/vnd.github.v3.raw'
       }
     });
     const content = response.data;
@@ -42,10 +39,8 @@ async function fetchKeysFromGitHub() {
   }
 }
 
-// 📤 PUSH KEYS (with SHA update)
 async function pushKeysToGitHub(keys) {
   try {
-    // First, get current file info to get SHA
     const fileInfo = await axios.get(GITHUB_API, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
@@ -58,7 +53,7 @@ async function pushKeysToGitHub(keys) {
     await axios.put(
       GITHUB_API,
       {
-        message: 'Update keys via Stany Admin Panel',
+        message: 'Update via Stany Admin Panel',
         content,
         sha,
         branch: 'main'
@@ -77,7 +72,6 @@ async function pushKeysToGitHub(keys) {
   }
 }
 
-// 🔐 AUTH
 app.post('/api/auth/login', (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) {
     isLoggedIn = true;
@@ -92,7 +86,6 @@ function requireAuth(req, res, next) {
   res.status(401).json({ error: 'Not authenticated' });
 }
 
-// 🌐 API ENDPOINTS
 app.get('/api/keys', requireAuth, async (req, res) => {
   try {
     const keys = await fetchKeysFromGitHub();
@@ -140,8 +133,6 @@ app.delete('/api/keys/:username', requireAuth, async (req, res) => {
   }
 });
 
-// 🚀 START SERVER
 app.listen(PORT, () => {
   console.log(`✅ Stany Key Admin running on port ${PORT}`);
-  console.log(`🔗 Managing: ${GITHUB_USER}/${REPO_NAME}/${FILE_PATH}`);
 });
