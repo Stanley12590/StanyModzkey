@@ -1,12 +1,12 @@
 [
   {
-    "Device Id": "PASTE-DEVICE-ID", 
-    "username": "PASTE-USERNAME",
-    "password": "PASTE-PASSWORD",
-    "expiry": "2025-10-15" // DATE FORMAT~ YYYY-MM-DD
+    "Device Id": "2bf8577922721e6d",
+    "username": "StanyModz",
+    "password": "101220",
+    "expiry": "2026-10-15"
   },
   {
-    "Device Id": "",  // NO DEVICE ID, LOGIN NOT WORK 
+    "Device Id": "",
     "username": "abc",
     "password": "101",
     "expiry": "2026-09-29"
@@ -15,7 +15,7 @@
     "Device Id": "PASTE-DEVICE-ID",
     "username": "def",
     "password": "102",
-    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+    "expiry": ""
   },
   {
     "Device Id": "PASTE-DEVICE-ID",
@@ -27,7 +27,7 @@
     "Device Id": "PASTE-DEVICE-ID",
     "username": "jkl",
     "password": "104",
-    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+    "expiry": ""
   },
   {
     "Device Id": "PASTE-DEVICE-ID",
@@ -39,6 +39,6 @@
     "Device Id": "PASTE-DEVICE-ID",
     "username": "pqr",
     "password": "106",
-    "expiry": "" // NO DATE NO EXPIRY UNLIMITED KEY 
+    "expiry": ""
   }
 ]
