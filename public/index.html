@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StanyModz Key Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔑</text></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>🔐 StanyModz Key Manager</h1>
+      <p>Securely manage premium access keys</p>
+    </header>
+
+    <!-- LOGIN -->
+    <section id="login-view">
+      <div class="card">
+        <h2>Admin Access</h2>
+        <input type="password" id="password" placeholder="Enter admin password" autocomplete="off" />
+        <button class="btn primary" onclick="login()">Login</button>
+        <p id="login-error" class="error"></p>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard-view" style="display:none;">
+      <div class="controls">
+        <button class="btn secondary" onclick="logout()">Logout</button>
+      </div>
+
+      <div class="card">
+        <h2>🔑 Add New Key</h2>
+        <div class="form-grid">
+          <input type="text" id="deviceId" placeholder="Device ID (optional)" />
+          <input type="text" id="username" placeholder="Username *" required />
+          <input type="text" id="password" placeholder="Password *" required />
+          <input type="date" id="expiry" />
+        </div>
+        <button class="btn primary" onclick="addKey()">+ Add Key</button>
+      </div>
+
+      <div class="card">
+        <h2>🔑 Active Keys (<span id="key-count">0</span>)</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Device ID</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="keys-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
