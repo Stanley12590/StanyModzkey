@@ -1,17 +1,18 @@
-// server.js — FINAL VERSION (GitHub API + JSON Error Handling)
+// server.js — FINAL & READY TO DEPLOY — NO CHANGES NEEDED
 const express = require('express');
 const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 👇 DON'T TOUCH THESE — SET IN RENDER ENVIRONMENT
 const GITHUB_USER = 'Stanley12590';
 const REPO_NAME = 'StanyModzkey';
 const FILE_PATH = 'Acceckey.json';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Must be set in Render
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
 
 if (!GITHUB_TOKEN) {
-  console.error('❌ FATAL: GITHUB_TOKEN environment variable is missing.');
+  console.error('❌ FATAL: GITHUB_TOKEN is missing. Set it in Render environment variables.');
   process.exit(1);
 }
 
@@ -22,29 +23,31 @@ let isLoggedIn = false;
 
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
 
+// 📥 Fetch keys from GitHub (using raw content)
 async function fetchKeysFromGitHub() {
   try {
     const response = await axios.get(GITHUB_API, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
-        'User-Agent': 'Stany-Key-Admin',
-        Accept: 'application/vnd.github.v3.raw'
+        'User-Agent': 'Stany-Key-Manager',
+        Accept: 'application/vnd.github.v3.raw' // ✅ CORRECT FOR FILE CONTENTS
       }
     });
-    const content = response.data;
-    return JSON.parse(content);
+    return JSON.parse(response.data); // Returns array of keys
   } catch (err) {
-    console.error('GitHub fetch error:', err.response?.status, err.response?.data || err.message);
-    throw new Error('Failed to fetch keys from GitHub');
+    console.error('GitHub fetch error:', err.message);
+    throw new Error('Failed to load keys from GitHub');
   }
 }
 
+// 📤 Update keys on GitHub
 async function pushKeysToGitHub(keys) {
   try {
+    // Get current file info to get SHA
     const fileInfo = await axios.get(GITHUB_API, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
-        'User-Agent': 'Stany-Key-Admin'
+        'User-Agent': 'Stany-Key-Manager'
       }
     });
     const sha = fileInfo.data.sha;
@@ -61,17 +64,18 @@ async function pushKeysToGitHub(keys) {
       {
         headers: {
           Authorization: `token ${GITHUB_TOKEN}`,
-          'User-Agent': 'Stany-Key-Admin',
+          'User-Agent': 'Stany-Key-Manager',
           'Content-Type': 'application/json'
         }
       }
     );
   } catch (err) {
-    console.error('GitHub push error:', err.response?.status, err.response?.data || err.message);
+    console.error('GitHub push error:', err.message);
     throw new Error('Failed to update keys on GitHub');
   }
 }
 
+// 🔐 Login route
 app.post('/api/auth/login', (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) {
     isLoggedIn = true;
@@ -83,9 +87,10 @@ app.post('/api/auth/login', (req, res) => {
 
 function requireAuth(req, res, next) {
   if (isLoggedIn) return next();
-  res.status(401).json({ error: 'Not authenticated' });
+  res.status(401).json({ error: 'Not logged in' });
 }
 
+// 🌐 API Routes
 app.get('/api/keys', requireAuth, async (req, res) => {
   try {
     const keys = await fetchKeysFromGitHub();
@@ -133,6 +138,8 @@ app.delete('/api/keys/:username', requireAuth, async (req, res) => {
   }
 });
 
+// 🚀 Start server
 app.listen(PORT, () => {
-  console.log(`✅ Stany Key Admin running on port ${PORT}`);
+  console.log(`✅ Stany Key Manager running on port ${PORT}`);
+  console.log(`🔗 Managing: ${GITHUB_USER}/${REPO_NAME}/${FILE_PATH}`);
 });
