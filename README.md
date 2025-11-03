@@ -14,7 +14,7 @@
 
 ## 📱 Need to manage or issue a key?
 Hit me up directly:  
-👉 [WhatsApp](https://wa.me/0787069580)
+👉 [WhatsApp](https://wa.me/+255787069580)
 
 ---
 
