@@ -90,16 +90,6 @@ function requireAuth(req, res, next) {
   res.status(401).json({ error: 'Not logged in' });
 }
 
-// 🌐 API Routes
-app.get('/api/keys', requireAuth, async (req, res) => {
-  try {
-    const keys = await fetchKeysFromGitHub();
-    res.json(keys);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to load keys' });
-  }
-});
-
 app.post('/api/keys', requireAuth, async (req, res) => {
   try {
     const keys = await fetchKeysFromGitHub();
