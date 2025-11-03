@@ -1,0 +1,12 @@
+[
+  {
+    "id": "main",
+    "username": "MainAdmin",
+    "password": "YourMainPassword123",
+    "role": "superadmin",
+    "phone": "+255123456789",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "isActive": true,
+    "invitedBy": "system"
+  }
+]
