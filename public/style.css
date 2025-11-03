@@ -1,0 +1,146 @@
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --light: #f9fafb;
+  --dark: #111827;
+  --gray: #9ca3af;
+  --card-bg: #ffffff;
+  --text: #1f2937;
+  --border: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #1e293b;
+    --text: #f1f5f9;
+    --border: #334155;
+    --light: #0f172a;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--light);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: var(--primary);
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid var(--border);
+}
+
+input, button {
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  outline: none;
+}
+
+input {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.error {
+  color: var(--danger);
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: 600;
+  color: var(--gray);
+}
+
+.status--expired { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.status--unlimited { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.status--no-device { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
