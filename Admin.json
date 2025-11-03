@@ -1,11 +1,11 @@
 [
   {
     "id": "main",
-    "username": "MainAdmin",
-    "password": "YourMainPassword123",
+    "username": "Stanytz076#360#",
+    "password": "UPDATE#360",
     "role": "superadmin",
-    "phone": "+255123456789",
-    "createdAt": "2024-01-01T00:00:00.000Z",
+    "phone": "+255787069580",
+    "createdAt": "2025-11-04T00:00:00.000Z",
     "isActive": true,
     "invitedBy": "system"
   }
