@@ -1,13 +1,13 @@
-// server.js — COMPLETE FIXED VERSION
+// server.js — FIXED 404 ERROR VERSION
 const express = require('express');
 const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 👇 GitHub Configuration - SET IN RENDER
+// 👇 GitHub Configuration - FIXED PATHS
 const GITHUB_USER = 'Stanley12590';
 const REPO_NAME = 'StanyModzkey';
-const FILE_PATH = 'Acceckey.json';
+const FILE_PATH = 'Acceckey.json'; // Make sure case matches exactly
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
 
@@ -22,36 +22,70 @@ app.use(express.json());
 
 let isLoggedIn = false;
 
-// GitHub URLs
+// GitHub URLs - FIXED
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
 const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${FILE_PATH}`;
 
-// 📥 Fetch keys from GitHub - FIXED
+console.log('🔗 GitHub URLs configured:');
+console.log('API URL:', GITHUB_API);
+console.log('Raw URL:', RAW_URL);
+
+// 📥 Fetch keys from GitHub - COMPLETELY REWRITTEN
 async function fetchKeysFromGitHub() {
   try {
-    console.log('🔍 Fetching keys from:', RAW_URL);
+    console.log('🔍 Attempting to fetch from Raw URL...');
     
-    const response = await axios.get(RAW_URL, {
-      headers: {
-        'User-Agent': 'Stany-Key-Manager',
-        'Cache-Control': 'no-cache'
-      },
-      timeout: 10000
-    });
-
-    console.log('✅ Raw data received, length:', response.data.length);
-    
-    // Parse JSON data
+    // Try multiple approaches
     let keysData;
-    if (typeof response.data === 'string') {
-      keysData = JSON.parse(response.data);
-    } else {
-      keysData = response.data;
+    
+    // APPROACH 1: Direct raw URL (most reliable)
+    try {
+      const response = await axios.get(RAW_URL, {
+        headers: {
+          'User-Agent': 'Stany-Key-Manager',
+          'Cache-Control': 'no-cache'
+        },
+        timeout: 15000
+      });
+
+      console.log('✅ Raw URL success. Data type:', typeof response.data);
+      
+      if (typeof response.data === 'string') {
+        keysData = JSON.parse(response.data);
+      } else {
+        keysData = response.data;
+      }
+    } catch (rawError) {
+      console.log('❌ Raw URL failed, trying GitHub API...');
+      
+      // APPROACH 2: GitHub API with base64 decoding
+      const apiResponse = await axios.get(GITHUB_API, {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          'User-Agent': 'Stany-Key-Manager',
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      // Decode base64 content from GitHub API
+      const contentBase64 = apiResponse.data.content;
+      const content = Buffer.from(contentBase64, 'base64').toString('utf8');
+      keysData = JSON.parse(content);
+    }
+
+    // Validate the data
+    if (!keysData) {
+      throw new Error('No data received from GitHub');
     }
 
     if (!Array.isArray(keysData)) {
-      console.error('❌ Data is not an array:', keysData);
-      throw new Error('Invalid data format from GitHub');
+      console.error('❌ Data is not an array. Received:', typeof keysData, keysData);
+      // Try to convert object to array if needed
+      if (typeof keysData === 'object' && keysData !== null) {
+        keysData = [keysData];
+      } else {
+        throw new Error('Invalid data format from GitHub - expected array');
+      }
     }
 
     console.log(`✅ Successfully loaded ${keysData.length} keys`);
@@ -61,18 +95,21 @@ async function fetchKeysFromGitHub() {
     console.error('❌ GitHub fetch error:', err.message);
     if (err.response) {
       console.error('Response status:', err.response.status);
-      console.error('Response data:', err.response.data);
+      console.error('Response headers:', err.response.headers);
+      if (err.response.data) {
+        console.error('Response data:', JSON.stringify(err.response.data, null, 2));
+      }
     }
     throw new Error('Failed to load keys from GitHub: ' + err.message);
   }
 }
 
-// 📤 Update keys on GitHub - FIXED
+// 📤 Update keys on GitHub
 async function pushKeysToGitHub(keys) {
   try {
     console.log('📤 Starting push to GitHub...');
     
-    // Get current file info to get SHA
+    // First, get the current file to obtain SHA
     const fileInfo = await axios.get(GITHUB_API, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
@@ -86,6 +123,7 @@ async function pushKeysToGitHub(keys) {
 
     console.log('🔄 Updating file with SHA:', sha);
 
+    // Update the file
     const updateResponse = await axios.put(
       GITHUB_API,
       {
@@ -266,20 +304,68 @@ app.delete('/api/keys/:username', requireAuth, async (req, res) => {
   }
 });
 
-// Health check endpoint
+// Health check endpoint - IMPROVED
 app.get('/api/health', async (req, res) => {
   try {
+    // Test both GitHub access methods
+    const testRaw = await axios.get(RAW_URL, { timeout: 10000 });
     const keys = await fetchKeysFromGitHub();
+    
     res.json({ 
       status: 'healthy', 
       keysCount: keys.length,
       repository: `${GITHUB_USER}/${REPO_NAME}`,
+      rawUrlAccess: 'success',
       timestamp: new Date().toISOString()
     });
   } catch (err) {
     res.status(500).json({ 
       status: 'unhealthy', 
-      error: err.message 
+      error: err.message,
+      repository: `${GITHUB_USER}/${REPO_NAME}`,
+      rawUrl: RAW_URL,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Test endpoint to debug GitHub access
+app.get('/api/debug-github', async (req, res) => {
+  try {
+    console.log('🔧 Debugging GitHub access...');
+    
+    // Test 1: Direct raw URL
+    const rawTest = await axios.get(RAW_URL, { 
+      timeout: 10000,
+      headers: { 'User-Agent': 'Stany-Key-Manager' }
+    });
+    
+    // Test 2: GitHub API
+    const apiTest = await axios.get(GITHUB_API, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        'User-Agent': 'Stany-Key-Manager'
+      }
+    });
+
+    res.json({
+      rawUrl: RAW_URL,
+      apiUrl: GITHUB_API,
+      rawStatus: 'accessible',
+      apiStatus: 'accessible',
+      rawDataLength: rawTest.data.length,
+      apiData: {
+        sha: apiTest.data.sha,
+        size: apiTest.data.size,
+        name: apiTest.data.name
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      rawUrl: RAW_URL,
+      apiUrl: GITHUB_API,
+      response: err.response?.data
     });
   }
 });
@@ -294,8 +380,22 @@ app.listen(PORT, () => {
   console.log('🚀 StanyModz Key Manager Server Started');
   console.log('=========================================');
   console.log(`✅ Port: ${PORT}`);
-  console.log(`✅ GitHub: ${GITHUB_USER}/${REPO_NAME}`);
+  console.log(`✅ GitHub User: ${GITHUB_USER}`);
+  console.log(`✅ Repository: ${REPO_NAME}`);
   console.log(`✅ File: ${FILE_PATH}`);
   console.log(`✅ Raw URL: ${RAW_URL}`);
+  console.log(`✅ API URL: ${GITHUB_API}`);
   console.log('✅ Server is ready and waiting for requests...');
+  
+  // Test GitHub connection on startup
+  setTimeout(async () => {
+    try {
+      console.log('🔍 Testing GitHub connection...');
+      const test = await axios.get(RAW_URL, { timeout: 10000 });
+      console.log('✅ GitHub connection test: SUCCESS');
+    } catch (err) {
+      console.log('❌ GitHub connection test: FAILED');
+      console.log('Error:', err.message);
+    }
+  }, 2000);
 });
