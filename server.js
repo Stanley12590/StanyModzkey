@@ -1,401 +1,354 @@
-// server.js — FIXED 404 ERROR VERSION
+// server.js — PREMIUM MULTI-ADMIN VERSION
 const express = require('express');
 const axios = require('axios');
+const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 👇 GitHub Configuration - FIXED PATHS
+// 👇 GitHub Configuration
 const GITHUB_USER = 'Stanley12590';
 const REPO_NAME = 'StanyModzkey';
-const FILE_PATH = 'Acceckey.json'; // Make sure case matches exactly
+const KEYS_FILE = 'Acceckey.json';
+const ADMINS_FILE = 'Admins.json';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
+const MAIN_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
 
-// Validate environment variables
 if (!GITHUB_TOKEN) {
-  console.error('❌ FATAL: GITHUB_TOKEN is missing. Set it in Render environment variables.');
+  console.error('❌ FATAL: GITHUB_TOKEN is missing.');
   process.exit(1);
 }
 
 app.use(express.static('public'));
 app.use(express.json());
 
-let isLoggedIn = false;
+// Session storage (in production use Redis)
+const sessions = new Map();
+const generateSessionId = () => crypto.randomBytes(16).toString('hex');
 
-// GitHub URLs - FIXED
-const GITHUB_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
-const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${FILE_PATH}`;
+// GitHub URLs
+const KEYS_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${KEYS_FILE}`;
+const KEYS_RAW = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${KEYS_FILE}`;
+const ADMINS_API = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${ADMINS_FILE}`;
+const ADMINS_RAW = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${ADMINS_FILE}`;
 
-console.log('🔗 GitHub URLs configured:');
-console.log('API URL:', GITHUB_API);
-console.log('Raw URL:', RAW_URL);
-
-// 📥 Fetch keys from GitHub - COMPLETELY REWRITTEN
-async function fetchKeysFromGitHub() {
-  try {
-    console.log('🔍 Attempting to fetch from Raw URL...');
-    
-    // Try multiple approaches
-    let keysData;
-    
-    // APPROACH 1: Direct raw URL (most reliable)
-    try {
-      const response = await axios.get(RAW_URL, {
-        headers: {
-          'User-Agent': 'Stany-Key-Manager',
-          'Cache-Control': 'no-cache'
-        },
-        timeout: 15000
-      });
-
-      console.log('✅ Raw URL success. Data type:', typeof response.data);
-      
-      if (typeof response.data === 'string') {
-        keysData = JSON.parse(response.data);
-      } else {
-        keysData = response.data;
-      }
-    } catch (rawError) {
-      console.log('❌ Raw URL failed, trying GitHub API...');
-      
-      // APPROACH 2: GitHub API with base64 decoding
-      const apiResponse = await axios.get(GITHUB_API, {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          'User-Agent': 'Stany-Key-Manager',
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-
-      // Decode base64 content from GitHub API
-      const contentBase64 = apiResponse.data.content;
-      const content = Buffer.from(contentBase64, 'base64').toString('utf8');
-      keysData = JSON.parse(content);
-    }
-
-    // Validate the data
-    if (!keysData) {
-      throw new Error('No data received from GitHub');
-    }
-
-    if (!Array.isArray(keysData)) {
-      console.error('❌ Data is not an array. Received:', typeof keysData, keysData);
-      // Try to convert object to array if needed
-      if (typeof keysData === 'object' && keysData !== null) {
-        keysData = [keysData];
-      } else {
-        throw new Error('Invalid data format from GitHub - expected array');
-      }
-    }
-
-    console.log(`✅ Successfully loaded ${keysData.length} keys`);
-    return keysData;
-
-  } catch (err) {
-    console.error('❌ GitHub fetch error:', err.message);
-    if (err.response) {
-      console.error('Response status:', err.response.status);
-      console.error('Response headers:', err.response.headers);
-      if (err.response.data) {
-        console.error('Response data:', JSON.stringify(err.response.data, null, 2));
-      }
-    }
-    throw new Error('Failed to load keys from GitHub: ' + err.message);
+// Default admins structure
+const defaultAdmins = [
+  {
+    id: "main",
+    username: "MainAdmin",
+    password: MAIN_ADMIN_PASSWORD,
+    role: "superadmin",
+    phone: "",
+    createdAt: new Date().toISOString(),
+    isActive: true
   }
-}
+];
 
-// 📤 Update keys on GitHub
-async function pushKeysToGitHub(keys) {
+// 📥 Fetch data from GitHub
+async function fetchFromGitHub(url, isRaw = true) {
   try {
-    console.log('📤 Starting push to GitHub...');
-    
-    // First, get the current file to obtain SHA
-    const fileInfo = await axios.get(GITHUB_API, {
+    const response = await axios.get(url, {
       headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
         'User-Agent': 'Stany-Key-Manager',
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-
-    const sha = fileInfo.data.sha;
-    const content = Buffer.from(JSON.stringify(keys, null, 2)).toString('base64');
-
-    console.log('🔄 Updating file with SHA:', sha);
-
-    // Update the file
-    const updateResponse = await axios.put(
-      GITHUB_API,
-      {
-        message: `Update keys via Stany Admin Panel - ${new Date().toISOString()}`,
-        content: content,
-        sha: sha,
-        branch: 'main'
+        ...(isRaw ? {} : { Authorization: `token ${GITHUB_TOKEN}` })
       },
-      {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          'User-Agent': 'Stany-Key-Manager',
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      }
-    );
-
-    console.log('✅ Successfully updated keys on GitHub');
-    return updateResponse.data;
-
-  } catch (err) {
-    console.error('❌ GitHub push error:', err.message);
-    if (err.response) {
-      console.error('Response status:', err.response.status);
-      console.error('Response data:', err.response.data);
+      timeout: 15000
+    });
+    
+    if (isRaw) {
+      return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
     }
-    throw new Error('Failed to update keys on GitHub: ' + err.message);
+    return response.data;
+  } catch (err) {
+    console.error('GitHub fetch error:', err.message);
+    throw err;
   }
 }
 
-// 🔐 Authentication Middleware
-function requireAuth(req, res, next) {
-  if (isLoggedIn) return next();
-  res.status(401).json({ error: 'Authentication required. Please login first.' });
-}
-
-// 🔑 Login endpoint
-app.post('/api/auth/login', (req, res) => {
-  const { password } = req.body;
-  
-  if (!password) {
-    return res.status(400).json({ error: 'Password is required' });
-  }
-
-  if (password === ADMIN_PASSWORD) {
-    isLoggedIn = true;
-    console.log('✅ Admin logged in successfully');
-    res.json({ 
-      success: true, 
-      message: 'Login successful' 
-    });
-  } else {
-    console.log('❌ Failed login attempt');
-    res.status(401).json({ error: 'Invalid password' });
-  }
-});
-
-// 🔑 Logout endpoint
-app.post('/api/auth/logout', (req, res) => {
-  isLoggedIn = false;
-  console.log('✅ Admin logged out');
-  res.json({ success: true, message: 'Logout successful' });
-});
-
-// 🌐 API Routes
-
-// Get all keys
-app.get('/api/keys', requireAuth, async (req, res) => {
+// 📤 Push data to GitHub
+async function pushToGitHub(apiUrl, data, message) {
   try {
-    console.log('📥 Fetching keys for admin...');
-    const keys = await fetchKeysFromGitHub();
-    res.json(keys);
-  } catch (err) {
-    console.error('❌ Error in /api/keys:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Add new key
-app.post('/api/keys', requireAuth, async (req, res) => {
-  try {
-    const { username, password, deviceId = '', expiry = '' } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
-    }
-
-    console.log(`➕ Adding new key for user: ${username}`);
-
-    const keys = await fetchKeysFromGitHub();
-    
-    // Check if username already exists
-    if (keys.some(k => k.username === username)) {
-      return res.status(409).json({ error: 'Username already exists' });
-    }
-
-    const newKey = {
-      "Device Id": deviceId,
-      "username": username,
-      "password": password,
-      "expiry": expiry
-    };
-
-    keys.push(newKey);
-    await pushKeysToGitHub(keys);
-
-    console.log(`✅ Key added successfully for: ${username}`);
-    res.status(201).json({ 
-      success: true, 
-      message: 'Key added successfully',
-      key: newKey 
-    });
-
-  } catch (err) {
-    console.error('❌ Error adding key:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Update key
-app.put('/api/keys/:username', requireAuth, async (req, res) => {
-  try {
-    const { username } = req.params;
-    const updates = req.body;
-
-    console.log(`✏️ Updating key for: ${username}`);
-
-    const keys = await fetchKeysFromGitHub();
-    const keyIndex = keys.findIndex(k => k.username === username);
-
-    if (keyIndex === -1) {
-      return res.status(404).json({ error: 'Key not found' });
-    }
-
-    // Update the key
-    keys[keyIndex] = { ...keys[keyIndex], ...updates };
-    await pushKeysToGitHub(keys);
-
-    console.log(`✅ Key updated successfully: ${username}`);
-    res.json({ 
-      success: true, 
-      message: 'Key updated successfully',
-      key: keys[keyIndex]
-    });
-
-  } catch (err) {
-    console.error('❌ Error updating key:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Delete key
-app.delete('/api/keys/:username', requireAuth, async (req, res) => {
-  try {
-    const { username } = req.params;
-
-    console.log(`🗑️ Deleting key for: ${username}`);
-
-    const keys = await fetchKeysFromGitHub();
-    const filteredKeys = keys.filter(k => k.username !== username);
-
-    if (filteredKeys.length === keys.length) {
-      return res.status(404).json({ error: 'Key not found' });
-    }
-
-    await pushKeysToGitHub(filteredKeys);
-
-    console.log(`✅ Key deleted successfully: ${username}`);
-    res.json({ 
-      success: true, 
-      message: 'Key deleted successfully' 
-    });
-
-  } catch (err) {
-    console.error('❌ Error deleting key:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Health check endpoint - IMPROVED
-app.get('/api/health', async (req, res) => {
-  try {
-    // Test both GitHub access methods
-    const testRaw = await axios.get(RAW_URL, { timeout: 10000 });
-    const keys = await fetchKeysFromGitHub();
-    
-    res.json({ 
-      status: 'healthy', 
-      keysCount: keys.length,
-      repository: `${GITHUB_USER}/${REPO_NAME}`,
-      rawUrlAccess: 'success',
-      timestamp: new Date().toISOString()
-    });
-  } catch (err) {
-    res.status(500).json({ 
-      status: 'unhealthy', 
-      error: err.message,
-      repository: `${GITHUB_USER}/${REPO_NAME}`,
-      rawUrl: RAW_URL,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// Test endpoint to debug GitHub access
-app.get('/api/debug-github', async (req, res) => {
-  try {
-    console.log('🔧 Debugging GitHub access...');
-    
-    // Test 1: Direct raw URL
-    const rawTest = await axios.get(RAW_URL, { 
-      timeout: 10000,
-      headers: { 'User-Agent': 'Stany-Key-Manager' }
-    });
-    
-    // Test 2: GitHub API
-    const apiTest = await axios.get(GITHUB_API, {
+    const fileInfo = await axios.get(apiUrl, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
         'User-Agent': 'Stany-Key-Manager'
       }
     });
 
-    res.json({
-      rawUrl: RAW_URL,
-      apiUrl: GITHUB_API,
-      rawStatus: 'accessible',
-      apiStatus: 'accessible',
-      rawDataLength: rawTest.data.length,
-      apiData: {
-        sha: apiTest.data.sha,
-        size: apiTest.data.size,
-        name: apiTest.data.name
+    const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
+
+    await axios.put(apiUrl, {
+      message,
+      content,
+      sha: fileInfo.data.sha,
+      branch: 'main'
+    }, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        'User-Agent': 'Stany-Key-Manager'
       }
     });
+
+    return true;
   } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      rawUrl: RAW_URL,
-      apiUrl: GITHUB_API,
-      response: err.response?.data
+    console.error('GitHub push error:', err.message);
+    throw err;
+  }
+}
+
+// 🔐 Authentication functions
+async function verifyAdmin(username, password) {
+  try {
+    const admins = await fetchFromGitHub(ADMINS_RAW);
+    const admin = admins.find(a => a.username === username && a.isActive);
+    
+    if (admin && admin.password === password) {
+      return { ...admin, password: undefined };
+    }
+    return null;
+  } catch (err) {
+    // If admins file doesn't exist, check main admin
+    if (username === "MainAdmin" && password === MAIN_ADMIN_PASSWORD) {
+      return defaultAdmins[0];
+    }
+    return null;
+  }
+}
+
+async function initializeAdminsFile() {
+  try {
+    await pushToGitHub(ADMINS_API, defaultAdmins, 'Initialize admins file');
+    console.log('✅ Admins file initialized');
+  } catch (err) {
+    console.log('Admins file already exists or error:', err.message);
+  }
+}
+
+// Middleware
+async function requireAuth(req, res, next) {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const session = sessions.get(sessionId);
+  if (session.expires < Date.now()) {
+    sessions.delete(sessionId);
+    return res.status(401).json({ error: 'Session expired' });
+  }
+
+  req.admin = session.admin;
+  next();
+}
+
+function requireSuperAdmin(req, res, next) {
+  if (req.admin.role === 'superadmin') return next();
+  res.status(403).json({ error: 'Superadmin access required' });
+}
+
+// 🌐 AUTH ROUTES
+app.post('/api/auth/login', async (req, res) => {
+  const { username, password, rememberMe } = req.body;
+
+  try {
+    const admin = await verifyAdmin(username, password);
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const sessionId = generateSessionId();
+    const expires = rememberMe ? Date.now() + (30 * 24 * 60 * 60 * 1000) : Date.now() + (2 * 60 * 60 * 1000);
+    
+    sessions.set(sessionId, { admin, expires });
+    
+    res.json({
+      success: true,
+      sessionId,
+      admin: { username: admin.username, role: admin.role }
     });
+  } catch (err) {
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+app.post('/api/auth/logout', (req, res) => {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+  if (sessionId) sessions.delete(sessionId);
+  res.json({ success: true });
 });
 
-// 🚀 Start server
-app.listen(PORT, () => {
-  console.log('🚀 StanyModz Key Manager Server Started');
-  console.log('=========================================');
-  console.log(`✅ Port: ${PORT}`);
-  console.log(`✅ GitHub User: ${GITHUB_USER}`);
-  console.log(`✅ Repository: ${REPO_NAME}`);
-  console.log(`✅ File: ${FILE_PATH}`);
-  console.log(`✅ Raw URL: ${RAW_URL}`);
-  console.log(`✅ API URL: ${GITHUB_API}`);
-  console.log('✅ Server is ready and waiting for requests...');
-  
-  // Test GitHub connection on startup
-  setTimeout(async () => {
+// 👑 ADMIN MANAGEMENT ROUTES
+app.get('/api/admins', requireAuth, requireSuperAdmin, async (req, res) => {
+  try {
+    const admins = await fetchFromGitHub(ADMINS_RAW);
+    res.json(admins.map(a => ({ ...a, password: undefined })));
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load admins' });
+  }
+});
+
+app.post('/api/admins', requireAuth, requireSuperAdmin, async (req, res) => {
+  const { username, phone, role = 'admin' } = req.body;
+
+  if (!username || !phone) {
+    return res.status(400).json({ error: 'Username and phone are required' });
+  }
+
+  try {
+    let admins;
     try {
-      console.log('🔍 Testing GitHub connection...');
-      const test = await axios.get(RAW_URL, { timeout: 10000 });
-      console.log('✅ GitHub connection test: SUCCESS');
+      admins = await fetchFromGitHub(ADMINS_RAW);
     } catch (err) {
-      console.log('❌ GitHub connection test: FAILED');
-      console.log('Error:', err.message);
+      admins = defaultAdmins;
     }
-  }, 2000);
+
+    if (admins.find(a => a.username === username)) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    // Generate secure password
+    const password = crypto.randomBytes(8).toString('hex');
+    const newAdmin = {
+      id: crypto.randomBytes(8).toString('hex'),
+      username,
+      password,
+      role,
+      phone,
+      createdAt: new Date().toISOString(),
+      isActive: true,
+      invitedBy: req.admin.username
+    };
+
+    admins.push(newAdmin);
+    await pushToGitHub(ADMINS_API, admins, `Add admin: ${username}`);
+
+    // Create WhatsApp message
+    const appUrl = `https://${req.get('host')}`;
+    const whatsappMessage = `Hello ${username}! You've been invited as ${role} to StanyModz Key Manager. Login: ${appUrl} Username: ${username} Password: ${password}`;
+    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
+
+    res.json({
+      success: true,
+      admin: { ...newAdmin, password: undefined },
+      whatsappUrl,
+      credentials: { username, password } // Only returned once
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add admin' });
+  }
+});
+
+app.put('/api/admins/:id', requireAuth, requireSuperAdmin, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  try {
+    const admins = await fetchFromGitHub(ADMINS_RAW);
+    const index = admins.findIndex(a => a.id === id);
+    
+    if (index === -1) return res.status(404).json({ error: 'Admin not found' });
+    if (admins[index].role === 'superadmin') {
+      return res.status(403).json({ error: 'Cannot modify superadmin' });
+    }
+
+    admins[index] = { ...admins[index], ...updates };
+    await pushToGitHub(ADMINS_API, admins, `Update admin: ${admins[index].username}`);
+
+    res.json({ success: true, admin: { ...admins[index], password: undefined } });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update admin' });
+  }
+});
+
+app.delete('/api/admins/:id', requireAuth, requireSuperAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const admins = await fetchFromGitHub(ADMINS_RAW);
+    const admin = admins.find(a => a.id === id);
+    
+    if (!admin) return res.status(404).json({ error: 'Admin not found' });
+    if (admin.role === 'superadmin') {
+      return res.status(403).json({ error: 'Cannot delete superadmin' });
+    }
+
+    const filtered = admins.filter(a => a.id !== id);
+    await pushToGitHub(ADMINS_API, filtered, `Remove admin: ${admin.username}`);
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete admin' });
+  }
+});
+
+// 🔑 KEY MANAGEMENT ROUTES (same as before but with requireAuth)
+app.get('/api/keys', requireAuth, async (req, res) => {
+  try {
+    const keys = await fetchFromGitHub(KEYS_RAW);
+    res.json(keys);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load keys' });
+  }
+});
+
+app.post('/api/keys', requireAuth, async (req, res) => {
+  try {
+    const keys = await fetchFromGitHub(KEYS_RAW);
+    const newKey = {
+      "Device Id": req.body.deviceId || "",
+      "username": req.body.username,
+      "password": req.body.password,
+      "expiry": req.body.expiry || "",
+      "createdBy": req.admin.username,
+      "createdAt": new Date().toISOString()
+    };
+
+    keys.push(newKey);
+    await pushToGitHub(KEYS_API, keys, `Add key: ${req.body.username}`);
+
+    res.status(201).json({ success: true, key: newKey });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add key' });
+  }
+});
+
+app.put('/api/keys/:username', requireAuth, async (req, res) => {
+  try {
+    const keys = await fetchFromGitHub(KEYS_RAW);
+    const index = keys.findIndex(k => k.username === req.params.username);
+    
+    if (index === -1) return res.status(404).json({ error: 'Key not found' });
+    
+    keys[index] = { ...keys[index], ...req.body };
+    await pushToGitHub(KEYS_API, keys, `Update key: ${req.params.username}`);
+
+    res.json({ success: true, key: keys[index] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update key' });
+  }
+});
+
+app.delete('/api/keys/:username', requireAuth, async (req, res) => {
+  try {
+    const keys = await fetchFromGitHub(KEYS_RAW);
+    const filtered = keys.filter(k => k.username !== req.params.username);
+    
+    if (filtered.length === keys.length) {
+      return res.status(404).json({ error: 'Key not found' });
+    }
+
+    await pushToGitHub(KEYS_API, filtered, `Delete key: ${req.params.username}`);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete key' });
+  }
+});
+
+// 🚀 Initialize and start server
+initializeAdminsFile();
+
+app.listen(PORT, () => {
+  console.log(`✅ StanyModz Premium running on port ${PORT}`);
+  console.log(`🔗 Repository: ${GITHUB_USER}/${REPO_NAME}`);
 });
