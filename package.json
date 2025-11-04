@@ -1,20 +1,16 @@
 {
   "name": "stanymodz-key-manager",
   "version": "2.0.0",
-  "description": "Premium key management system",
+  "description": "Premium multi-admin key management system",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "echo 'No build step required'"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.6.0"
   },
   "engines": {
-    "node": "18.x"
-  },
-  "cacheDirectories": [
-    "node_modules"
-  ]
+    "node": ">=16.0.0"
+  }
 }
