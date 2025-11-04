@@ -1,4 +1,4 @@
-// server.js — URGENT FIX FOR 404 ERROR
+// server.js — COMPLETE WORKING VERSION
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
@@ -66,7 +66,7 @@ async function fetchFromGitHub(url, isRaw = true) {
   } catch (err) {
     if (err.response && err.response.status === 404) {
       console.log(`📭 File not found (404): ${url}`);
-      return null; // Return null instead of throwing error
+      return null;
     }
     console.error('❌ GitHub fetch error:', err.message);
     throw err;
@@ -91,7 +91,7 @@ async function pushToGitHub(apiUrl, data, message) {
     } catch (error) {
       if (error.response && error.response.status === 404) {
         console.log('📄 Creating new file...');
-        sha = null; // No SHA for new files
+        sha = null;
       } else {
         throw error;
       }
@@ -104,7 +104,6 @@ async function pushToGitHub(apiUrl, data, message) {
       branch: 'main'
     };
 
-    // Only add SHA if file exists
     if (sha) {
       payload.sha = sha;
     }
@@ -249,7 +248,7 @@ app.post('/api/admins', requireAuth, requireSuperAdmin, async (req, res) => {
     }
 
     // Generate secure password
-    const password = crypto.randomBytes(8).toString('hex');
+    const password = crypto.randomBytes(6).toString('hex');
     const newAdmin = {
       id: crypto.randomBytes(8).toString('hex'),
       username,
@@ -264,19 +263,25 @@ app.post('/api/admins', requireAuth, requireSuperAdmin, async (req, res) => {
     admins.push(newAdmin);
     await pushToGitHub(ADMINS_API, admins, `Add admin: ${username}`);
 
-    // Create WhatsApp message
+    // ✅ FIXED WHATSAPP LINK - Opens directly in chat
     const appUrl = `https://${req.get('host')}`;
-    const whatsappMessage = `Hello ${username}! You've been invited as ${role} to StanyModz Key Manager. Login: ${appUrl} Username: ${username} Password: ${password}`;
-    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // WhatsApp message template
+    const message = `🔐 *STANYMODZ ADMIN INVITATION*\n\nHello ${username}! You have been invited as ${role} to StanyModz Key Manager.\n\n📱 *Login Details:*\n🌐 Website: ${appUrl}\n👤 Username: ${username}\n🔑 Password: ${password}\n\nPlease login and change your password immediately.`;
+    
+    // Direct WhatsApp chat link
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
 
     res.json({
       success: true,
       admin: { ...newAdmin, password: undefined },
       whatsappUrl,
-      credentials: { username, password }
+      credentials: { username, password },
+      directMessage: `WhatsApp invitation ready for ${cleanPhone}`
     });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to add admin' });
+    res.status(500).json({ error: 'Failed to add admin: ' + err.message });
   }
 });
 
@@ -301,7 +306,7 @@ app.delete('/api/admins/:id', requireAuth, requireSuperAdmin, async (req, res) =
   }
 });
 
-// 🔑 KEY MANAGEMENT ROUTES
+// 🔑 KEY MANAGEMENT ROUTES - ALL FIXED
 app.get('/api/keys', requireAuth, async (req, res) => {
   try {
     const keys = await fetchFromGitHub(KEYS_RAW) || [];
@@ -313,38 +318,118 @@ app.get('/api/keys', requireAuth, async (req, res) => {
 
 app.post('/api/keys', requireAuth, async (req, res) => {
   try {
+    const { deviceId, username, password, expiry } = req.body;
+
+    console.log(`➕ Adding new key: ${username}`);
+
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    if (username.length < 3) {
+      return res.status(400).json({ error: 'Username must be at least 3 characters' });
+    }
+
     const keys = await fetchFromGitHub(KEYS_RAW) || [];
+    
+    // Check for duplicate username
+    if (keys.some(k => k.username === username)) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
     const newKey = {
-      "Device Id": req.body.deviceId || "",
-      "username": req.body.username,
-      "password": req.body.password,
-      "expiry": req.body.expiry || "",
+      "Device Id": deviceId || "",
+      "username": username.trim(),
+      "password": password,
+      "expiry": expiry || "",
       "createdBy": req.admin.username,
-      "createdAt": new Date().toISOString()
+      "createdAt": new Date().toISOString(),
+      "status": "active"
     };
 
     keys.push(newKey);
-    await pushToGitHub(KEYS_API, keys, `Add key: ${req.body.username}`);
+    await pushToGitHub(KEYS_API, keys, `Add key: ${username}`);
 
-    res.status(201).json({ success: true, key: newKey });
+    console.log(`✅ Key added successfully: ${username}`);
+    res.status(201).json({ 
+      success: true, 
+      message: 'Key added successfully',
+      key: newKey 
+    });
+
   } catch (err) {
-    res.status(500).json({ error: 'Failed to add key' });
+    console.error('❌ Add key error:', err.message);
+    res.status(500).json({ error: 'Failed to add key: ' + err.message });
   }
 });
 
-app.delete('/api/keys/:username', requireAuth, async (req, res) => {
+// 🔑 EDIT KEY - NEW ENDPOINT
+app.put('/api/keys/:username', requireAuth, async (req, res) => {
   try {
+    const { username } = req.params;
+    const { password, expiry, deviceId, status } = req.body;
+
+    console.log(`✏️ Editing key: ${username}`);
+
     const keys = await fetchFromGitHub(KEYS_RAW) || [];
-    const filtered = keys.filter(k => k.username !== req.params.username);
-    
-    if (filtered.length === keys.length) {
+    const keyIndex = keys.findIndex(k => k.username === username);
+
+    if (keyIndex === -1) {
       return res.status(404).json({ error: 'Key not found' });
     }
 
-    await pushToGitHub(KEYS_API, filtered, `Delete key: ${req.params.username}`);
-    res.json({ success: true });
+    // Update fields
+    if (password) keys[keyIndex].password = password;
+    if (expiry) keys[keyIndex].expiry = expiry;
+    if (deviceId) keys[keyIndex]["Device Id"] = deviceId;
+    if (status) keys[keyIndex].status = status;
+
+    keys[keyIndex].updatedAt = new Date().toISOString();
+    keys[keyIndex].updatedBy = req.admin.username;
+
+    await pushToGitHub(KEYS_API, keys, `Update key: ${username}`);
+
+    res.json({ 
+      success: true, 
+      message: 'Key updated successfully',
+      key: keys[keyIndex]
+    });
+
   } catch (err) {
-    res.status(500).json({ error: 'Failed to delete key' });
+    console.error('❌ Edit key error:', err.message);
+    res.status(500).json({ error: 'Update failed: ' + err.message });
+  }
+});
+
+// 🔑 DELETE KEY - FIXED
+app.delete('/api/keys/:username', requireAuth, async (req, res) => {
+  try {
+    const { username } = req.params;
+    console.log(`🗑️ Attempting to delete key: ${username}`);
+
+    const keys = await fetchFromGitHub(KEYS_RAW) || [];
+    console.log(`📊 Current keys: ${keys.length}`);
+    
+    const filteredKeys = keys.filter(k => k.username !== username);
+    
+    if (filteredKeys.length === keys.length) {
+      console.log(`❌ Key not found: ${username}`);
+      return res.status(404).json({ error: 'Key not found' });
+    }
+
+    console.log(`✅ Key found, deleting: ${username}`);
+    await pushToGitHub(KEYS_API, filteredKeys, `Delete key: ${username}`);
+    
+    res.json({ 
+      success: true, 
+      message: 'Key deleted successfully',
+      deletedKey: username
+    });
+    
+  } catch (err) {
+    console.error('❌ Delete key error:', err.message);
+    res.status(500).json({ error: 'Delete failed: ' + err.message });
   }
 });
 
