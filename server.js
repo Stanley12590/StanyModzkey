@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 // 👇 GitHub Configuration
 const GITHUB_USER = 'Stanley12590';
 const REPO_NAME = 'StanyModzkey';
-const KEYS_FILE = 'Acceckey.json';
+const KEYS_FILE = 'Accesskey.json';
 const ADMINS_FILE = 'Admins.json';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const MAIN_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SecurePass123!';
