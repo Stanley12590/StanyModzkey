@@ -89,7 +89,7 @@
 
         .card-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -202,6 +202,10 @@
             background: linear-gradient(135deg, var(--secondary), #d97706);
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray), #4b5563);
+        }
+
         .btn-outline {
             background: transparent;
             border: 2px solid var(--primary);
@@ -266,6 +270,11 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
+        .key-card.inactive {
+            opacity: 0.7;
+            background: #f3f4f6;
+        }
+
         .key-header {
             display: flex;
             justify-content: space-between;
@@ -279,6 +288,24 @@
             color: var(--dark);
         }
 
+        .key-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .key-status.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .key-status.inactive {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .key-details p {
             margin: 8px 0;
             color: var(--gray);
@@ -288,6 +315,7 @@
             display: flex;
             gap: 8px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         /* Admin List Styles */
@@ -425,6 +453,10 @@
             
             .header h1 {
                 font-size: 2rem;
+            }
+            
+            .key-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -636,7 +668,7 @@
             
             <div class="form-group">
                 <label>WhatsApp Invitation Link</label>
-                <a id="whatsappLink" class="btn btn-success" style="width: 100%;" target="_blank">
+                <a id="whatsappLink" class="btn btn-success" style="width: 100%; text-decoration: none;" target="_blank">
                     <i class="fab fa-whatsapp"></i> Send via WhatsApp
                 </a>
             </div>
@@ -803,17 +835,25 @@
                 }
 
                 keysList.innerHTML = keys.map(key => `
-                    <div class="key-card">
+                    <div class="key-card ${key.status === 'inactive' ? 'inactive' : ''}">
                         <div class="key-header">
                             <div class="key-username">👤 ${key.username}</div>
-                            <div class="key-badge">${key.expiry ? '📅 ' + key.expiry : 'No expiry'}</div>
+                            <div class="key-status ${key.status || 'active'}">${key.status || 'active'}</div>
                         </div>
                         <div class="key-details">
                             <p>🔑 Password: ${key.password}</p>
                             <p>📱 Device: ${key['Device Id'] || 'Not set'}</p>
+                            <p>📅 Expiry: ${key.expiry || 'No expiry'}</p>
+                            <p>🔄 Status: ${key.status || 'active'}</p>
                             ${key.createdBy ? `<p>👨‍💻 Created by: ${key.createdBy}</p>` : ''}
                         </div>
                         <div class="key-actions">
+                            <button class="btn btn-warning btn-sm" onclick="editKey('${key.username}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleKeyStatus('${key.username}', '${key.status || 'active'}')">
+                                <i class="fas fa-sync"></i> ${key.status === 'active' ? 'Deactivate' : 'Activate'}
+                            </button>
                             <button class="btn btn-danger btn-sm" onclick="deleteKey('${key.username}')">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
@@ -834,6 +874,11 @@
 
             if (!username || !password) {
                 showAlert('Username and password are required');
+                return;
+            }
+
+            if (username.length < 3) {
+                showAlert('Username must be at least 3 characters');
                 return;
             }
 
@@ -862,6 +907,59 @@
                     showTab('keysTab');
                 } else {
                     showAlert(data.error || 'Failed to add key');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message);
+            }
+        }
+
+        async function editKey(username) {
+            const newPassword = prompt(`Enter new password for ${username}:`);
+            if (!newPassword) return;
+
+            try {
+                const response = await fetch(`/api/keys/${username}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentSession}`
+                    },
+                    body: JSON.stringify({ password: newPassword })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Key updated successfully!', 'success');
+                    loadKeys();
+                } else {
+                    showAlert(data.error || 'Failed to update key');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message);
+            }
+        }
+
+        async function toggleKeyStatus(username, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            
+            try {
+                const response = await fetch(`/api/keys/${username}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentSession}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(`Key ${newStatus} successfully!`, 'success');
+                    loadKeys();
+                } else {
+                    showAlert(data.error || 'Failed to update key status');
                 }
             } catch (error) {
                 showAlert('Network error: ' + error.message);
@@ -1018,10 +1116,8 @@
             // Check for stored session
             const storedSession = localStorage.getItem('stanymodz_session');
             if (storedSession) {
-                // Verify session is still valid
-                currentSession = storedSession;
-                // You might want to add a session verification endpoint
-                console.log('Stored session found');
+                // For now, just clear it to force fresh login
+                localStorage.removeItem('stanymodz_session');
             }
         });
     </script>
